@@ -73,11 +73,27 @@ class DatingApp {
     }
 
     showLoadingScreen() {
+        // 1. Инициализируем анимацию логотипа сразу
+        this.uiHandler.initLogoAnimation(); 
+
+        // 2. Через некоторое время (достаточное для проигрывания анимации)
+        //    плавно скрываем экран загрузки и показываем основное приложение.
+        //    Анимация логотипа длится 1.5 секунды, поэтому 1.5 секунды - это хороший таймаут.
         setTimeout(() => {
-            document.getElementById('loadingScreen').style.display = 'none';
-            document.getElementById('appContainer').style.display = 'block';
-            this.uiHandler.initLogoAnimation();
-        }, 2000); // Уменьшили время загрузки до 2 секунд
+            const loadingScreen = document.getElementById('loadingScreen');
+            const appContainer = document.getElementById('appContainer');
+
+            // Устанавливаем opacity в 0 для плавного исчезновения
+            loadingScreen.style.opacity = '0'; 
+
+            // Ждем завершения CSS-перехода opacity, затем скрываем элемент
+            loadingScreen.addEventListener('transitionend', function handler() {
+                loadingScreen.style.display = 'none';
+                appContainer.style.display = 'block';
+                // Удаляем слушатель, чтобы он не срабатывал повторно
+                loadingScreen.removeEventListener('transitionend', handler); 
+            }, { once: true }); // { once: true } также удаляет слушатель после первого срабатывания
+        }, 1500); // 1.5 секунды, чтобы анимация логотипа успела проиграться
     }
 
     initElements() {
